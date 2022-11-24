@@ -25,5 +25,44 @@ const handleListen = () =>
 const server = http.createServer(app); //http 서버
 const wss = new WebSocket.Server({ server }); //ws 서버, http서버를 넣어서 같이 구동, http 서버가 필요 없다면 파라미터를 비울 것
 
+function handleConnection(socket) {
+  console.log(socket);
+}
+
+const sockets = []; //철자 다름
+
+//커넥션이 생기면 아래 코드가 작동한다.
+wss.on("connection", (socket) => {
+  sockets.push(socket); //연결이 발생하면 파폭이면 파폭, 크롬이면 크롬을 소켓 배열에 저장
+
+  socket["nickname"] = "익명"; //소켓에 이름을 익명으로 준다.
+  console.log("백엔드, 브라우저에 연결합니다.");
+
+  //아래 콘솔로그는 사용자가 인터넷 창을 닫거나 할 경우, 내 VSCODE에서 나타나는 콘솔로그다
+  //즉, 서버에서 발생하는 이벤트
+  socket.on("close", () => console.log("백엔드, 연결이 끊어졌습니다!"));
+
+  //소켓이 메시지를 보낼 때까지 기다린다.
+  socket.on("message", (msg) => {
+    const message = JSON.parse(msg);
+
+    switch (message.type) {
+      case "new_message":
+        const messageString = message.toString("utf8");
+        sockets.forEach((aSocket) =>
+          aSocket.send(`${socket.nickname}: ${message.payload}`)
+        ); //각 브라우저를 aSocket이라고 한다.
+      case "nickname":
+        socket["nickname"] = message.payload;
+    }
+
+    console.log(message, message);
+
+    //console.log(message.toString("utf8")); //메시지를 받아오는데 이상하게 받아진다.
+    //그 문제를 해결하기 위해서 toString("utf8")을 적용
+  });
+  //socket.send("::백엔드가 프론트엔드에게, Hello::");
+});
+
 //app.listen(3750, handleListen);
 server.listen(3750, handleListen); //http 서버위에 ws서버도 담겼다.

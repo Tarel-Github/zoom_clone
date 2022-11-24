@@ -10,5 +10,11 @@ html(lang="en")
         header
             h1 Tarel
         main
-            h2 welcome to Tarel
+            form#nick
+                input(type="text", placeholder="닉네임 적기", required="")
+                button 저장
+            ul
+            form#message
+                input(type="text", placeholder="메시지 적기", required="")
+                button 보내기
         script(src="/public/js/app.js")
