@@ -47,8 +47,10 @@ wss.on("connection", (socket) => {
     const message = JSON.parse(msg);
 
     switch (message.type) {
-      case "new_message":
+      case "new_message": //메시지가 들어오면 다른 모두에게 메시지를 전달
         const messageString = message.toString("utf8");
+        //console.log(message.toString("utf8")); //메시지를 받아오는데 이상하게 받아진다.
+        //그 문제를 해결하기 위해서 toString("utf8")을 적용
         sockets.forEach((aSocket) =>
           aSocket.send(`${socket.nickname}: ${message.payload}`)
         ); //각 브라우저를 aSocket이라고 한다.
@@ -57,9 +59,6 @@ wss.on("connection", (socket) => {
     }
 
     console.log(message, message);
-
-    //console.log(message.toString("utf8")); //메시지를 받아오는데 이상하게 받아진다.
-    //그 문제를 해결하기 위해서 toString("utf8")을 적용
   });
   //socket.send("::백엔드가 프론트엔드에게, Hello::");
 });
